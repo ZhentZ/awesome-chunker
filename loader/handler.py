@@ -110,7 +110,6 @@ class FileHandler:
     def type2md(self):
         pass
 
-
 class MarkitDownHandler(FileHandler):
     supported = [".docx",".pdf",".xlsx",".xls",".csv"]
     dependencies = ["markitdown[all]"]
@@ -121,13 +120,26 @@ class MarkitDownHandler(FileHandler):
             f.write(content)
         return new_file_path
 
-    def read(
+    def convert2md(
         self,
         keep_data_uris=False
     ):
         self._check_install(self.dependencies)
         from markitdown import MarkItDown
-        result = MarkItDown().convert(self.file_path, keep_data_uris=keep_data_uris)
+        result = MarkItDown().convert(
+            self.file_path, 
+            keep_data_uris=keep_data_uris
+        )
+        self.console.print(f"[bold] {self.file_path} 转换成功 [/bold]")
+        return result
+
+    def convert(self):
+        return self.convert2md()
+
+    def read(
+        self
+    ):
+        result = self.convert()
         # self.console.print(f"[bold]content: {result.text_content} [/bold]")
         return OriginalData(
             content=result.text_content,
@@ -135,6 +147,8 @@ class MarkitDownHandler(FileHandler):
             file_name=self._save(result.text_content).name,
             original_file_name=self.file_path.name
         )
+
+# class MinerUHandler(FileHandler):
 
 if __name__ == "__main__":
     file = MarkitDownHandler("/workspace/Python/awesome-chunker/task/task2/src/user_document.docx")
